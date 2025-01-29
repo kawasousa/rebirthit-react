@@ -1,0 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    --white: #D9D9D9;
+    --purple: #9f72ff;
+    --ligth-blue: #304351;
+    --gray: #1B2730;
+    --light-gray: #394753;
+    --dark-gray: #06141D;
+    font-family: "Poppins", serif;
+    color: var(--white);
+}
+
+button{
+    cursor: pointer;
+    border: none;
+}
+
+input {
+    border: none;
+    outline: none;
+}
+
+textarea{
+    outline: none;
+}
