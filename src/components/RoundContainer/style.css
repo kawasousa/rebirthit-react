@@ -1,0 +1,7 @@
+.round-container {
+    background-color: var(--gray);
+    border-radius: 1rem;
+    padding: 1rem;
+    min-width: fit-content;
+    min-height: fit-content;
+}
