@@ -1,32 +1,51 @@
 import './style.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import '../../assets/icons/icons'
-import { useEffect, useRef } from 'react'
+import '../../assets/icons/project-icons'
+import { useEffect, useRef, useState } from 'react'
 import { usePosts } from '../../hooks/posts/UsePosts'
 import RoundContainer from '../../components/RoundContainer'
 import LogoContainer from '../../components/LogoContainer'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, loggoutUser } from '../../services/authService'
+import { createPost } from '../../services/PostService'
+import ErrorPage from '../ErrorPage'
+
 
 function Home() {
     const navigate = useNavigate();
     useEffect(() => {
-        if (!getCurrentUser()) {
-            navigate("/auth/login");
+        async function checkAuth() {
+            const userData = await getCurrentUser();
+            if (!userData) navigate("/login");
+            else setUser(userData);
         }
-    }, [navigate])
+        checkAuth()
+        
+    }, [navigate]);
 
-    const newPostContent = useRef();
-    const searchInput = useRef();
-    const { posts, loading, error } = usePosts();
+    const [user, setUser] = useState(null);
 
-    function createPostHandler() {
-        console.log(newPostContent.current.innerText);
+    const newPostContent = useRef("");
+    const searchInput = useRef("");
+    const { posts, setPosts, loading, error } = usePosts();
+
+    async function createPostHandler(event) {
+        event.preventDefault();
+
+        const content = newPostContent.current.innerText;
+        if(content){
+            const newPost = await createPost(content);
+            if(newPost){
+                setPosts(prevPosts => [newPost, ...prevPosts]);
+            }
+            newPostContent.current.innerText = '';
+        }
     }
 
-    function loggoutHandler(){
-        loggoutUser();
-        navigate("/auth/login");
+    if(!user){
+        return (
+            <ErrorPage/>
+        )
     }
 
     return (
@@ -38,12 +57,12 @@ function Home() {
                     <p>Options</p>
                 </RoundContainer>
                 <RoundContainer>
-                    <button onClick={loggoutHandler}>Sair</button>
+                    <button onClick={()=>{loggoutUser(navigate)}}>Sair</button>
                 </RoundContainer>
             </div>
             <div className="posts-container">
                 <RoundContainer extraClasses={"new-post-container"}>
-                    <FontAwesomeIcon icon="poo" size='3x' />
+                    <FontAwesomeIcon icon={user.icon} size='3x' />
                     <p contentEditable name="new-post-input" data-placeholder="O que há de novo?"
                         className='new-post-input' id="new-post-input" ref={newPostContent} />
                     <button onClick={createPostHandler}>Compartilhar</button>
@@ -62,9 +81,9 @@ function Home() {
                             : posts.map(post => (
                                 <RoundContainer key={post.id}>
                                     <div className="post-profile-container">
-                                        <FontAwesomeIcon icon="user-astronaut" size='2x' />
-                                        <p>{post.profileName}</p>
-                                        <p className="subtle-info">● @{post.usernameOwner}</p>
+                                        <FontAwesomeIcon icon={post.iconOwner} size='2x' />
+                                        <p>{post.nameOwner}</p>
+                                        <p className="subtle-info">| @{post.usernameOwner}</p>
                                     </div>
                                     <p className="post-content">{post.content}</p>
                                     <p className="subtle-info">{post.createdAt}</p>
