@@ -19,13 +19,15 @@ function SignUp() {
 
   function handleSignUp(event) {
     event.preventDefault();
-    createProfile(navigate, username, email, password, name, selectedIcon);
+    if (selectedIcon && username && email && password && name) {
+      createProfile(navigate, username, email, password, name, selectedIcon);
+    }
   }
 
   return (
     <div className="main-container">
       <LogoContainer />
-      <h2>{`Boas vindas${!name? '!' : ', ' + name + '!'}`}</h2>
+      <h2>{`Boas vindas${!name ? '!' : ', ' + name + '!'}`}</h2>
       <form>
         <RoundContainer>
           <input
