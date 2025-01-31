@@ -19,7 +19,8 @@ export function usePosts() {
         }
 
         fetchData();
-    }, [])
+    }, []
+    )
 
-    return { posts, loading, error }
+    return { posts, setPosts, loading, error }
 }
