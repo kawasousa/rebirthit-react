@@ -1,4 +1,5 @@
   import './style.css'
+  import AngelIcon from '../../assets/icons/angel-icon.svg'
   import { useState } from "react";
   import { Link, useNavigate } from 'react-router-dom';
   import { logginUser } from "../../services/authService";
@@ -6,12 +7,13 @@
   import LogoContainer from "../../components/LogoContainer";
 
   function Login() {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    function handleLogin() {
-      logginUser(username, password, navigate);
+    function handleLogin(event) {
+      event.preventDefault();
+      logginUser(email, password, navigate);
     }
 
     return (
@@ -22,17 +24,17 @@
           <RoundContainer>
             <input
               type="text"
-              placeholder="Username"
-              
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </RoundContainer>
           <RoundContainer>
             <input
               type="text"
               placeholder="Password"
-              
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -41,7 +43,7 @@
             <button onClick={handleLogin}>Login</button>
           </RoundContainer>
         </form>
-        <Link to={"/auth/signup"}>Crie uma conta!</Link>
+        <Link to={"/signup"}>Crie uma conta!</Link>
       </div>
     );
   };
