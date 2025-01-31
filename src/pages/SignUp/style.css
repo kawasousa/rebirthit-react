@@ -5,3 +5,39 @@
 body {
     width: 1vh;
 }
+
+.icons-container{
+    display: flex;
+    flex-direction: row;
+    gap: .2rem;
+}
+
+.selected-icon{
+    background-color: transparent;
+    border-radius: 1rem;
+    scale: 1;
+    transition: .2s;
+}
+
+.selected-icon:hover{
+    scale: 1.5;
+    transition: scale .2s;
+}
+
+.selected-icon.active{
+    background-color: var(--purple);
+    padding: .8rem .2rem;
+    transition: .5;
+}
+
+.submit-button{
+    background-color: var(--gray);
+    border-radius: 1rem;
+    padding: 1rem;
+    transition: .3s;
+}
+
+.submit-button:hover{
+    background-color: var(--purple);
+    transition: .3s;
+}
