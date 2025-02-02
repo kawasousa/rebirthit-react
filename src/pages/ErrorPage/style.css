@@ -1,0 +1,6 @@
+body {
+    background-color: var(--dark-gray);
+    display: flex;
+    align-items: center;
+}
+
