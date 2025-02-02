@@ -1,10 +1,10 @@
 import api from './api'
 import Cookies from 'js-cookie'
 
-async function logginUser(email, password, navigate) {
+async function logginUser(username, password, navigate) {
     try {
         const response = await api.post("/auth/login", {
-            email: email,
+            username: username,
             password: password
         })
 
@@ -21,10 +21,10 @@ function loggoutUser(navigate) {
     navigate("/login");
 }
 
-function createProfile(navigate, username, email, password, name, icon) {
+function createProfile(navigate, username, password, name, icon) {
     try {
         api.post("/auth/register", {
-            username, email, password, name, icon, role: "Default"
+            username, password, name, icon, role: "Default"
         })
 
         navigate("/");
