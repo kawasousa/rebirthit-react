@@ -3,8 +3,8 @@ import { getAllPosts } from "../../services/PostService";
 
 export function usePosts() {
     const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [postLoading, setLoading] = useState(true);
+    const [postError, setError] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -22,5 +22,5 @@ export function usePosts() {
     }, []
     )
 
-    return { posts, setPosts, loading, error }
+    return { posts, setPosts, postLoading, postError }
 }
