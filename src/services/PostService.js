@@ -16,5 +16,14 @@ export async function createPost(content) {
     } catch (error) {
         console.log(error);
     }
+}
 
+export async function deletePost(id) {
+    try {
+        const user = await getCurrentUser();
+        await api.delete('/posts/' + id,{data: { requestingUsername: user.username }});
+    } catch (error) {
+        console.log(error);
+
+    }
 }
