@@ -3,101 +3,236 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import '../../assets/icons/project-icons'
 import { useEffect, useRef, useState } from 'react'
 import { usePosts } from '../../hooks/posts/UsePosts'
+import { useProfiles } from '../../hooks/profiles/useProfiles'
 import RoundContainer from '../../components/RoundContainer'
 import LogoContainer from '../../components/LogoContainer'
+import Timestamp from '../../components/Timestamp'
+import PoPup from '../../components/PopUp'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, loggoutUser } from '../../services/authService'
-import { createPost } from '../../services/PostService'
+import { createPost, deletePost } from '../../services/PostService'
 import ErrorPage from '../ErrorPage'
-
 
 function Home() {
     const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+
     useEffect(() => {
         async function checkAuth() {
             const userData = await getCurrentUser();
-            if (!userData) navigate("/login");
+            if (!userData) navigate('/login');
             else setUser(userData);
         }
         checkAuth()
-        
+
     }, [navigate]);
 
-    const [user, setUser] = useState(null);
+    const newPostContent = useRef('');
+    const searchInput = useRef('');
 
-    const newPostContent = useRef("");
-    const searchInput = useRef("");
-    const { posts, setPosts, loading, error } = usePosts();
+    const { posts, setPosts, postLoading, postError } = usePosts();
+    const { profiles, profileLoading, profileError } = useProfiles();
+
+    useEffect(() => {
+        setFilteredProfiles(profiles)
+    }, [profiles]);
+
+    useEffect(() => {
+        setFilteredPosts(posts);
+    }, [posts])
+
+    const [filteredProfiles, setFilteredProfiles] = useState(profiles);
+    const [filteredPosts, setFilteredPosts] = useState(posts);
+
+    const [trashHovered, setTrashHovered] = useState('');
+
+    const [popUps, setPopUps] = useState([]);
+    function removePopUp(index) {
+        setPopUps(prevPopUps => prevPopUps.filter((_, i) => i !== index));
+    }
 
     async function createPostHandler(event) {
         event.preventDefault();
 
         const content = newPostContent.current.innerText;
-        if(content){
+        if (content) {
             const newPost = await createPost(content);
-            if(newPost){
+            if (newPost) {
                 setPosts(prevPosts => [newPost, ...prevPosts]);
+                setUser(prevUser => ({ ...prevUser, postsCount: prevUser.postsCount + 1 }));
             }
             newPostContent.current.innerText = '';
+            clearSearch();
         }
     }
 
-    if(!user){
+    async function deletePostHandler(postId) {
+        await deletePost(postId);
+        const updatedPosts = posts.filter(post => post.id !== postId);
+        setPosts(updatedPosts);
+
+        setUser(prevUser => ({ ...prevUser, postsCount: prevUser.postsCount - 1 }));
+
+        clearSearch()
+
+        setPopUps( prevPopUps => [...prevPopUps, 'Publicação removida!']);
+        console.log(popUps);
+        
+    }
+
+    function handleSearch() {
+        const content = searchInput.current.value;
+        if (content) {
+            const newFilteredProfiles = profiles.filter(profile => profile.username.startsWith(content))
+
+            if (!newFilteredProfiles.length) {
+                setFilteredProfiles([]);
+                setFilteredPosts(posts);
+            }
+            else {
+                const filteredProfilesUsernames = newFilteredProfiles.map(user => user.username);
+
+                setFilteredPosts(posts => posts.filter(post => filteredProfilesUsernames.includes(post.usernameOwner)));
+                setFilteredProfiles(newFilteredProfiles);
+
+            };
+        }
+        else setFilteredProfiles(profiles);
+    }
+
+    function clearSearch() {
+        searchInput.current.value = '';
+        setFilteredPosts(posts);
+        setFilteredProfiles(profiles)
+    }
+
+    if (!user) {
         return (
-            <ErrorPage/>
+            <ErrorPage />
         )
     }
 
     return (
-        <div className="container">
-            <div className="sidebar-container">
-                <LogoContainer />
-
-                <RoundContainer extraClasses={"options-container"}>
-                    <p>Options</p>
-                </RoundContainer>
-                <RoundContainer>
-                    <button onClick={()=>{loggoutUser(navigate)}}>Sair</button>
-                </RoundContainer>
-            </div>
-            <div className="posts-container">
-                <RoundContainer extraClasses={"new-post-container"}>
-                    <FontAwesomeIcon icon={user.icon} size='3x' />
-                    <p contentEditable name="new-post-input" data-placeholder="O que há de novo?"
-                        className='new-post-input' id="new-post-input" ref={newPostContent} />
-                    <button onClick={createPostHandler}>Compartilhar</button>
-                </RoundContainer>
-
-                <h3>Novas publicações</h3>
-                {
-                    loading ?
-                        <FontAwesomeIcon icon="circle-notch" spin size='3x' />
-                        : error ?
-                            <RoundContainer extraClasses={"center-container"}>
-                                <h2>{error.message}</h2>
-                                <FontAwesomeIcon icon="triangle-exclamation" bounce size='4x' />
-                                <h3>Não foi possível buscar as publicações</h3>
-                            </RoundContainer>
-                            : posts.map(post => (
-                                <RoundContainer key={post.id}>
-                                    <div className="post-profile-container">
-                                        <FontAwesomeIcon icon={post.iconOwner} size='2x' />
-                                        <p>{post.nameOwner}</p>
-                                        <p className="subtle-info">| @{post.usernameOwner}</p>
-                                    </div>
-                                    <p className="post-content">{post.content}</p>
-                                    <p className="subtle-info">{post.createdAt}</p>
-                                </RoundContainer>
-                            ))
+        <div className='home-container'>
+            <div>
+                { popUps.map((message, index)=>(
+                    <PoPup key={index} message={message} onClose={()=> removePopUp(index)} />
+                ))
                 }
             </div>
-            <RoundContainer extraClasses={"search-container"}>
-                <input type="text" name="search-input" id="search-input" placeholder='Buscar' ref={searchInput} />
-                <button>
-                    <FontAwesomeIcon icon="magnifying-glass" />
+            <div className='profile-container'>
+                <button onClick={() => { window.scrollTo(0, 0) }}> <LogoContainer /> </button>
+                <RoundContainer extraClasses={'profile-info-container'}>
+                    <FontAwesomeIcon icon={user.icon} size='4x' />
+                    <div>
+                        <h3>{user.name} &nbsp;
+                            {user.role === 'Admin' &&
+                                <FontAwesomeIcon icon='circle-check' />
+                            }
+                        </h3>
+                        <h5 className='subtle-info'> @{user.username} </h5>
+                        <h5>
+                            {user.postsCount + (user.postsCount === 1 ? ' Publicação' : ' Publicações')}
+                        </h5>
+                    </div>
+                </RoundContainer>
+                <button onClick={() => { loggoutUser(navigate) }} className='loggout-button'>
+                    Sair
                 </button>
-            </RoundContainer>
-        </div>
+            </div>
+            <div className='center-container'>
+                <RoundContainer extraClasses={'new-post-container'}>
+                    <FontAwesomeIcon icon={user.icon} size='3x' />
+                    <p contentEditable name='new-post-input' data-placeholder='O que há de novo?'
+                        className='new-post-input' ref={newPostContent} />
+                    <button onClick={createPostHandler}>Compartilhar</button>
+                </RoundContainer>
+                <div className='posts-container'>
+                    <h3>Novas publicações</h3>
+                    {
+                        postLoading ? <FontAwesomeIcon icon='circle-notch' spin size='3x' /> :
+                            postError ?
+                                <RoundContainer>
+                                    <h2>{error.message}</h2>
+                                    <FontAwesomeIcon icon='triangle-exclamation' bounce size='4x' />
+                                    <h3>Não foi possível buscar as publicações</h3>
+                                </RoundContainer> :
+                                filteredPosts.map(post => (
+                                    <RoundContainer key={post.id} extraClasses={'post-container'}>
+                                        <div>
+                                            <div className='post-profile-container'>
+                                                <FontAwesomeIcon icon={post.iconOwner} size='2x' />
+                                                <p>
+                                                    {post.nameOwner} &nbsp;
+                                                    {
+                                                        post.roleOwner === 'Admin' &&
+                                                        <FontAwesomeIcon icon='circle-check' />
+                                                    }
+                                                </p>
+                                                <p className='subtle-info'>| &nbsp; @{post.usernameOwner}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => deletePostHandler(post.id)}
+                                                onMouseEnter={() => { setTrashHovered(post.id) }}
+                                                onMouseLeave={() => { setTrashHovered('') }}
+                                            >
+                                                {(user.role === 'Admin' || post.usernameOwner === user.username) &&
+                                                    <FontAwesomeIcon
+                                                        icon='trash'
+                                                        bounce={trashHovered === post.id}
+                                                    />
+                                                }
+                                            </button>
+                                        </div>
+                                        <p className='post-content'>{post.content}</p>
+                                        <Timestamp createdAt={post.createdAt} extraClasses={'subtle-info'} />
+                                    </RoundContainer>
+                                ))
+                    }
+                </div>
+            </div>
+            <div className="search-container">
+                <div>
+                    <input type='text' name='search-input'
+                        placeholder='Filtrar por perfil...'
+                        ref={searchInput}
+                        onChange={handleSearch}
+                    />
+                    {(searchInput.current.value) &&
+                        <button onClick={clearSearch}>
+                            <FontAwesomeIcon icon='filter-circle-xmark' />
+                        </button>
+                    }
+                </div>
+                {filteredProfiles.length > 0 ? (
+                    profileLoading ? <FontAwesomeIcon icon='circle-notch' spin /> :
+                        profileError ?
+                            <RoundContainer>
+                                <h2>{error.message}</h2>
+                                <FontAwesomeIcon icon='triangle-exclamation' bounce size='4x' />
+                                <h3>Não foi possível buscar os perfis!</h3>
+                            </RoundContainer> :
+                            <RoundContainer>
+                                <div className="profiles-container">
+                                    {
+                                        filteredProfiles.map(profile => (
+                                            <div key={profile.id}>
+                                                <FontAwesomeIcon icon={profile.icon} />
+                                                <p>{profile.name}</p>
+                                                <p className='subtle-info'>@{profile.username}</p>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </RoundContainer>
+                ) :
+                    <RoundContainer>
+                        <FontAwesomeIcon icon='person-circle-question' size='2x' /> &nbsp;
+                        Ninguém encontrado
+                    </RoundContainer>
+                }
+            </div>
+        </div >
     )
 }
 
