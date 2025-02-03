@@ -1,5 +1,4 @@
 import './style.css'
-import AngelIcon from '../../assets/icons/angel-icon.svg'
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { logginUser } from "../../services/authService";
