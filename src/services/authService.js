@@ -12,7 +12,7 @@ async function logginUser(username, password, navigate) {
 
         navigate("/")
     } catch (error) {
-
+        console.log(error);
     }
 }
 
