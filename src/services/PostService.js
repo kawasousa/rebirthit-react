@@ -1,4 +1,4 @@
-import api from './api'
+import api from './rebirthit-api'
 import { getCurrentUser } from './authService';
 
 export async function getAllPosts() {

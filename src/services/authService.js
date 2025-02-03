@@ -1,4 +1,4 @@
-import api from './api'
+import api from './rebirthit-api'
 import Cookies from 'js-cookie'
 
 async function logginUser(username, password, navigate) {
