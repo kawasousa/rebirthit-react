@@ -1,6 +1,5 @@
 import axios from 'axios';
 import api from './rebirthit-api'
-import Cookies from 'js-cookie'
 
 async function loginUser(username, password) {
     try {
@@ -12,13 +11,6 @@ async function loginUser(username, password) {
         console.log('Resposta da API: ' + response.data);
 
         if (response.data.error) throw new Error(response.data.error);
-
-        const token = response.data.token;
-        console.log('token ausente na resposta');
-
-        if (!token) throw new Error('erro ao autenticar');
-
-        Cookies.set('auth_token', token)
 
         console.log('login bem sucedido, retornando' + response.data.profileDTO + 'para o usuario');
 
