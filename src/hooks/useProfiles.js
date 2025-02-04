@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAllProfiles } from "../../services/ProfileService";
+import { getAllProfiles } from "../services/ProfileService";
 
 export function useProfiles() {
     const [profiles, setProfiles] = useState([]);

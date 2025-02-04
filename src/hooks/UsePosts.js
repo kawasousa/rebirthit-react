@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAllPosts } from "../../services/PostService";
+import { getAllPosts } from "../services/PostService";
 
 export function usePosts() {
     const [posts, setPosts] = useState([]);
