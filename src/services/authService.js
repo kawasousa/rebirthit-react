@@ -9,17 +9,31 @@ async function loginUser(username, password) {
             password: password
         })
 
+        console.log('Resposta da API: ' + response.data);
+
         if (response.data.error) throw new Error(response.data.error);
 
         const token = response.data.token;
+        console.log('token ausente na resposta');
+
         if (!token) throw new Error('erro ao autenticar');
 
         Cookies.set('auth_token', token)
-        
-        return response.data.profileDTO;
 
+        console.log('login bem sucedido, retornando' + response.data.profileDTO + 'para o usuario');
+
+        return response.data.profileDTO;
     } catch (error) {
-        const message = axios.isAxiosError(error)? error.response?.data?.error: 'erro desconhecido'
+        console.log('erro capturado pelo catch: ' + error);
+
+        let message = 'erro desconhecido'
+
+        if (axios.isAxiosError(error)) {
+            message = error.response
+        }
+
+        console.log('mensagem enviada para frente: ' + message);
+
         throw new Error(message);
     }
 }
@@ -34,7 +48,7 @@ async function createProfile(username, password, name, icon) {
         const response = await api.post("/auth/register", {
             username, password, name, icon, role: "Default"
         })
-    
+
         if (!response.data.profileDTO) throw new Error(response.data.error)
     } catch (error) {
         throw new Error(error.error)
