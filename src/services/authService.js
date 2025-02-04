@@ -8,11 +8,13 @@ async function logginUser(username, password) {
             password: password
         })
 
+        console.log(response);
+
         const token = response.data.token;
 
         if (!token) throw new Error(response.data.error);
 
-        Cookies.set('auth_token', token)
+        Cookies.set('auth_token', token)        
 
     } catch (error) {
         throw new Error(error.error);

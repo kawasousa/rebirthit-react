@@ -23,6 +23,8 @@ function Login() {
         addPopUp('Login feito com sucesso');
         navigate("/")
       } catch (error) {
+        console.log(error);
+        
         addPopUp('Erro ao tentar fazer login: ' + (error.message));
       }
     }
