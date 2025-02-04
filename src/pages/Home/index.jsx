@@ -8,7 +8,7 @@ import { usePopUps } from '../../hooks/UsePopUps'
 import RoundContainer from '../../components/RoundContainer'
 import LogoContainer from '../../components/LogoContainer'
 import Timestamp from '../../components/Timestamp'
-import PoPup from '../../components/PopUp'
+import PopUp from '../../components/PopUp'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, loggoutUser } from '../../services/authService'
 import { createPost, deletePost } from '../../services/PostService'
@@ -116,7 +116,7 @@ function Home() {
     return (
         <div className='home-container'>
             <div>
-                {popUps.map((message, index) => (<PoPup key={index} message={message} onClose={() => removePopUp(index)} />))}
+                {popUps.map((message, index) => (<PopUp key={index} message={message} onClose={() => removePopUp(index)} />))}
             </div>
             <div className='profile-container'>
                 <button onClick={() => { window.scrollTo(0, 0) }}> <LogoContainer /> </button>
