@@ -23,7 +23,7 @@ function Login() {
         addPopUp('Login feito com sucesso');
         navigate("/")
       } catch (error) {
-        addPopUp('Erro ao tentar fazer login: ' + (error.error? error.error: error.message? error.message: 'erro desconhecido'));
+        addPopUp('Erro ao tentar fazer login: ' + (error.message));
       }
     }
     else addPopUp('Preencha todos os campos antes de prosseguir');
