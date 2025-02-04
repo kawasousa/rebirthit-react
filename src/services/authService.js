@@ -2,18 +2,18 @@ import api from './rebirthit-api'
 import Cookies from 'js-cookie'
 
 async function logginUser(username, password, navigate) {
-    try {
-        const response = await api.post("/auth/login", {
-            username: username,
-            password: password
-        })
+    const response = await api.post("/auth/login", {
+        username: username,
+        password: password
+    })
 
-        Cookies.set('auth_token', response.data.token)
+    const token = response.data.token;
 
-        navigate("/")
-    } catch (error) {
-        console.log(error);
-    }
+    if (!token) throw new Error(response.data.error);
+
+    Cookies.set('auth_token', token)
+
+    navigate("/")
 }
 
 function loggoutUser(navigate) {
@@ -21,25 +21,21 @@ function loggoutUser(navigate) {
     navigate("/login");
 }
 
-function createProfile(navigate, username, password, name, icon) {
-    try {
-        api.post("/auth/register", {
-            username, password, name, icon, role: "Default"
-        })
+async function createProfile(navigate, username, password, name, icon) {
+    const response = await api.post("/auth/register", {
+        username, password, name, icon, role: "Default"
+    })
 
-        navigate("/");
-    }
-    catch (error) {
-        console.log(error);
+    if (!response) throw new Error('Error while registering')
 
-    }
+    navigate("/");
 }
 
 async function getCurrentUser() {
     try {
         const response = await api.get("auth/me");
         return response.data.profile;
-        
+
     } catch (error) {
         return null;
     }

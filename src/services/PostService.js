@@ -10,18 +10,17 @@ export async function createPost(content) {
     const user = await getCurrentUser();
     const username = user.username;
 
-    try {
-        const response = await api.post("/posts", { content, username });
-        return response.data;
-    } catch (error) {
-        console.log(error);
-    }
+    const response = await api.post("/posts", { content, username });
+
+    if(!response.data) throw new Error('Erro ao criar publicação')
+
+    return response.data;
 }
 
 export async function deletePost(id) {
     try {
         const user = await getCurrentUser();
-        await api.delete('/posts/' + id,{data: { requestingUsername: user.username }});
+        await api.delete('/posts/' + id, { data: { requestingUsername: user.username } });
     } catch (error) {
         console.log(error);
 
