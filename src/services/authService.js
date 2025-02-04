@@ -9,7 +9,7 @@ async function logginUser(username, password) {
 
     const token = response.data.token;
 
-    if (!token) throw new Error(response.data.error, );
+    if (!token) throw new Error(response.data.error);
 
     Cookies.set('auth_token', token)
 }
@@ -24,7 +24,7 @@ async function createProfile(username, password, name, icon) {
         username, password, name, icon, role: "Default"
     })
 
-    if (!response) throw new Error('Erro ao criar conta')
+    if (!response.data.profileDTO) throw new Error(response.data.error)
 }
 
 async function getCurrentUser() {
