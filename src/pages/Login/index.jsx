@@ -13,7 +13,9 @@ function Login() {
 
   const { popUps, addPopUp, removePopUp } = usePopUps();
 
-  async function handleLogin() {
+  async function handleLogin(event) {
+    event.preventDefault();
+    
     if (username && password) {
       addPopUp('Fazendo login...');
 
