@@ -46,7 +46,7 @@ function SignUp() {
   return (
     <div className="main-container">
       <div>
-        {popUps.map((message, index) => (<PoPup key={index} message={message} onClose={() => removePopUp(index)} />))}
+        {popUps.map((message, index) => (<PopUp key={index} message={message} onClose={() => removePopUp(index)} />))}
       </div>
       <LogoContainer />
       <h2>{`Boas vindas${!name ? '' : ', ' + name}`}!</h2>

@@ -41,7 +41,7 @@ function Login() {
     <div className="main-container">
       <LogoContainer />
       <div>
-        {popUps.map((message, index) => (<PoPup key={index} message={message} onClose={() => removePopUp(index)} />))}
+        {popUps.map((message, index) => (<PopUp key={index} message={message} onClose={() => removePopUp(index)} />))}
       </div>
       <h2>Entre na sua conta</h2>
       <form>
