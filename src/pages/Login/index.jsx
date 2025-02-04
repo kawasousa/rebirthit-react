@@ -19,10 +19,11 @@ function Login() {
       addPopUp('Fazendo login...');
 
       try {
-        await logginUser(username, password, navigate);
+        await logginUser(username, password);
         addPopUp('Login feito com sucesso');
+        navigate("/")
       } catch (error) {
-        addPopUp('Erro ao tentar fazer login: ' + error.message);
+        addPopUp('Erro ao tentar fazer login: ' + (error.error? error.error: error.message? error.message: 'erro desconhecido'));
       }
     }
     else addPopUp('Preencha todos os campos antes de prosseguir');
