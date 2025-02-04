@@ -14,7 +14,9 @@ async function loginUser(username, password) {
         const token = response.data.token;
         if (!token) throw new Error('erro ao autenticar');
 
-        Cookies.set('auth_token', token)        
+        Cookies.set('auth_token', token)
+        
+        return response.data.profileDTO;
 
     } catch (error) {
         const message = axios.isAxiosError(error)? error.response?.data?.error: 'erro desconhecido'

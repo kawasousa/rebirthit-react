@@ -20,9 +20,11 @@ function Login() {
       addPopUp('Fazendo login...');
 
       try {
-        await loginUser(username, password);
+        const userData = await loginUser(username, password);
         addPopUp('Login feito com sucesso');
-        navigate("/")
+        
+        if(userData) navigate("/");
+        
       } catch (error) {
         addPopUp('Falha no login: ' + (error.message));
       }
