@@ -1,7 +1,7 @@
 import './style.css'
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import { logginUser } from "../../services/authService";
+import { loginUser } from "../../services/authService";
 import { usePopUps } from '../../hooks/UsePopUps'
 import LogoContainer from "../../components/LogoContainer";
 import PopUp from '../../components/PopUp'
@@ -13,19 +13,16 @@ function Login() {
 
   const { popUps, addPopUp, removePopUp } = usePopUps();
 
-  async function handleLogin(event) {
-    event.preventDefault();
+  async function handleLogin() {
     if (username && password) {
       addPopUp('Fazendo login...');
 
       try {
-        await logginUser(username, password);
+        await loginUser(username, password);
         addPopUp('Login feito com sucesso');
         navigate("/")
       } catch (error) {
-        console.log(error);
-        
-        addPopUp('Erro ao tentar fazer login: ' + (error.message));
+        addPopUp('Falha no login: ' + (error.message));
       }
     }
     else addPopUp('Preencha todos os campos antes de prosseguir');

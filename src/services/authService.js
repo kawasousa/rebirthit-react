@@ -1,23 +1,24 @@
+import axios from 'axios';
 import api from './rebirthit-api'
 import Cookies from 'js-cookie'
 
-async function logginUser(username, password) {
+async function loginUser(username, password) {
     try {
         const response = await api.post("/auth/login", {
             username: username,
             password: password
         })
 
-        console.log(response);
+        if (response.data.error) throw new Error(response.data.error);
 
         const token = response.data.token;
-
-        if (!token) throw new Error(response.data.error);
+        if (!token) throw new Error('erro ao autenticar');
 
         Cookies.set('auth_token', token)        
 
     } catch (error) {
-        throw new Error(error.error);
+        const message = axios.isAxiosError(error)? error.response?.data?.error: 'erro desconhecido'
+        throw new Error(message);
     }
 }
 
@@ -48,4 +49,4 @@ async function getCurrentUser() {
     }
 }
 
-export { logginUser, loggoutUser, getCurrentUser, createProfile }
+export { loginUser, loggoutUser, getCurrentUser, createProfile }
