@@ -1,7 +1,7 @@
 import api from './rebirthit-api'
 import Cookies from 'js-cookie'
 
-async function logginUser(username, password, navigate) {
+async function logginUser(username, password) {
     const response = await api.post("/auth/login", {
         username: username,
         password: password
@@ -9,26 +9,22 @@ async function logginUser(username, password, navigate) {
 
     const token = response.data.token;
 
-    if (!token) throw new Error(response.data.error);
+    if (!token) throw new Error(response.data.error, );
 
     Cookies.set('auth_token', token)
-
-    navigate("/")
 }
 
-function loggoutUser(navigate) {
-    api.post("/auth/loggout");
+async function loggoutUser(navigate) {
+    await api.post("/auth/loggout");
     navigate("/login");
 }
 
-async function createProfile(navigate, username, password, name, icon) {
+async function createProfile(username, password, name, icon) {
     const response = await api.post("/auth/register", {
         username, password, name, icon, role: "Default"
     })
 
-    if (!response) throw new Error('Error while registering')
-
-    navigate("/");
+    if (!response) throw new Error('Erro ao criar conta')
 }
 
 async function getCurrentUser() {
