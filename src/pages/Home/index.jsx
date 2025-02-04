@@ -2,8 +2,9 @@ import './style.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import '../../assets/icons/project-icons'
 import { useEffect, useRef, useState } from 'react'
-import { usePosts } from '../../hooks/posts/UsePosts'
-import { useProfiles } from '../../hooks/profiles/useProfiles'
+import { usePosts } from '../../hooks/UsePosts'
+import { useProfiles } from '../../hooks/useProfiles'
+import { usePopUps } from '../../hooks/UsePopUps'
 import RoundContainer from '../../components/RoundContainer'
 import LogoContainer from '../../components/LogoContainer'
 import Timestamp from '../../components/Timestamp'
@@ -32,6 +33,7 @@ function Home() {
 
     const { posts, setPosts, postLoading, postError } = usePosts();
     const { profiles, profileLoading, profileError } = useProfiles();
+    const { popUps, addPopUp, removePopUp } = usePopUps();
 
     useEffect(() => {
         setFilteredProfiles(profiles)
@@ -46,38 +48,38 @@ function Home() {
 
     const [trashHovered, setTrashHovered] = useState('');
 
-    const [popUps, setPopUps] = useState([]);
-    function removePopUp(index) {
-        setPopUps(prevPopUps => prevPopUps.filter((_, i) => i !== index));
-    }
-
     async function createPostHandler(event) {
         event.preventDefault();
 
+        addPopUp('Criando publicação...');
+
         const content = newPostContent.current.innerText;
         if (content) {
-            const newPost = await createPost(content);
-            if (newPost) {
+            try {
+                const newPost = await createPost(content);
+
                 setPosts(prevPosts => [newPost, ...prevPosts]);
                 setUser(prevUser => ({ ...prevUser, postsCount: prevUser.postsCount + 1 }));
+
+                addPopUp('Publicação criada com sucesso!');
+                newPostContent.current.innerText = '';
+                clearSearch();
+            } catch (error) {
+                addPopUp(error.message);
             }
-            newPostContent.current.innerText = '';
-            clearSearch();
         }
     }
 
     async function deletePostHandler(postId) {
+        addPopUp('Apagando publicação...');
         await deletePost(postId);
         const updatedPosts = posts.filter(post => post.id !== postId);
-        setPosts(updatedPosts);
 
+        setPosts(updatedPosts);
         setUser(prevUser => ({ ...prevUser, postsCount: prevUser.postsCount - 1 }));
 
         clearSearch()
-
-        setPopUps( prevPopUps => [...prevPopUps, 'Publicação removida!']);
-        console.log(popUps);
-        
+        addPopUp('Publicação removida!')
     }
 
     function handleSearch() {
@@ -94,8 +96,7 @@ function Home() {
 
                 setFilteredPosts(posts => posts.filter(post => filteredProfilesUsernames.includes(post.usernameOwner)));
                 setFilteredProfiles(newFilteredProfiles);
-
-            };
+            }
         }
         else setFilteredProfiles(profiles);
     }
@@ -115,10 +116,7 @@ function Home() {
     return (
         <div className='home-container'>
             <div>
-                { popUps.map((message, index)=>(
-                    <PoPup key={index} message={message} onClose={()=> removePopUp(index)} />
-                ))
-                }
+                {popUps.map((message, index) => (<PoPup key={index} message={message} onClose={() => removePopUp(index)} />))}
             </div>
             <div className='profile-container'>
                 <button onClick={() => { window.scrollTo(0, 0) }}> <LogoContainer /> </button>

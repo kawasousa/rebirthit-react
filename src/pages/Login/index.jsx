@@ -2,6 +2,7 @@ import './style.css'
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { logginUser } from "../../services/authService";
+import { usePopUps } from '../../hooks/UsePopUps'
 import LogoContainer from "../../components/LogoContainer";
 import PopUp from '../../components/PopUp'
 
@@ -10,33 +11,37 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  function handleLogin(event) {
+  const { popUps, addPopUp, removePopUp } = usePopUps();
+
+  async function handleLogin(event) {
     event.preventDefault();
-    if (username && password)
-      logginUser(username, password, navigate);
-    else setPopUps(prevPopUps => [...prevPopUps, 'Preencha todos os campos antes de prosseguir'])
+    if (username && password) {
+      addPopUp('Fazendo login...');
+
+      try {
+        await logginUser(username, password, navigate);
+        addPopUp('Login feito com sucesso');
+      } catch (error) {
+        addPopUp('Erro ao tentar fazer login: ' + error.message);
+      }
+    }
+    else addPopUp('Preencha todos os campos antes de prosseguir');
   }
 
   function handleUsernameChange(e) {
-    const value = e.target.value;
+    const value = e.target.value.toLowerCase();
+
     if (/^[a-z0-9._]*$/.test(value)) {
       setUsername(value);
     }
-  }
-
-  const [popUps, setPopUps] = useState([]);
-  function removePopUp(index) {
-    setPopUps(prevPopUps => prevPopUps.filter((_, i) => i !== index));
+    else addPopUp('Nomes de usuário devem ter apenas letras, números ou _')
   }
 
   return (
     <div className="main-container">
       <LogoContainer />
       <div>
-        {popUps.map((message, index) => (
-          <PopUp key={index} message={message} onClose={() => removePopUp(index)} />
-        ))
-        }
+        {popUps.map((message, index) => (<PoPup key={index} message={message} onClose={() => removePopUp(index)} />))}
       </div>
       <h2>Entre na sua conta</h2>
       <form>

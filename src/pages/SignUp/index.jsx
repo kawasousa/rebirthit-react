@@ -2,6 +2,7 @@ import './style.css'
 import '../../assets/icons/profile-icons'
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
+import { usePopUps } from '../../hooks/UsePopUps';
 import RoundContainer from '../../components/RoundContainer'
 import LogoContainer from "../../components/LogoContainer";
 import PopUp from '../../components/PopUp'
@@ -10,41 +11,42 @@ import { createProfile } from '../../services/authService'
 
 function SignUp() {
   const navigate = useNavigate();
+  const { popUps, addPopUp, removePopUp } = usePopUps();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-
-  const profileIcons = ["user-astronaut", "mug-saucer", "user-graduate", "user-ninja"];
   const [selectedIcon, setSelectedIcon] = useState(null);
 
-  function handleSignUp(event) {
+  const profileIcons = ["user-astronaut", "mug-saucer", "user-graduate", "user-ninja"];
+
+  async function handleSignUp(event) {
     event.preventDefault();
-    if (selectedIcon && username && password && name, selectedIcon) {
-      createProfile(navigate, username, password, name, selectedIcon);
+    if (selectedIcon && username && password && name && selectedIcon) {
+      addPopUp('Criando conta...')
+
+      try {
+        await createProfile(navigate, username, password, name, selectedIcon);
+        addPopUp('Conta criada com sucesso!')
+      } catch (error) {
+        addPopUp('Erro ao criar conta: ' + error.message)
+      }
     }
-    else setPopUps(prevPopUps => [...prevPopUps, 'Preencha todos os campos antes de prosseguir'])
+    else addPopUp('Preencha todos os campos antes de prosseguir');
   }
 
   function handleUsernameChange(e) {
-    const value = e.target.value;
-    e.target.value = 'a'
+    const value = e.target.value.toLowerCase();
+
     if (/^[a-z0-9._]*$/.test(value)) {
       setUsername(value);
     }
-  }
-
-  const [popUps, setPopUps] = useState([]);
-  function removePopUp(index) {
-    setPopUps(prevPopUps => prevPopUps.filter((_, i) => i !== index));
+    else addPopUp('Nomes de usuário só podem conter letras, números ou _')
   }
 
   return (
     <div className="main-container">
       <div>
-        {popUps.map((message, index) => (
-          <PopUp key={index} message={message} onClose={() => removePopUp(index)} />
-        ))
-        }
+        {popUps.map((message, index) => (<PoPup key={index} message={message} onClose={() => removePopUp(index)} />))}
       </div>
       <LogoContainer />
       <h2>{`Boas vindas${!name ? '' : ', ' + name}`}!</h2>
