@@ -43,16 +43,19 @@ function Home() {
         setFilteredPosts(posts);
     }, [posts])
 
+    useEffect(()=>{
+        if((window.matchMedia("(max-width: 1625px)").matches)) addPopUp('Tente uma tela maior para uma experiência completa!');
+    },[])
+
     const [filteredProfiles, setFilteredProfiles] = useState(profiles);
     const [filteredPosts, setFilteredPosts] = useState(posts);
     const [trashHovered, setTrashHovered] = useState('');
 
     async function createPostHandler(event) {
         event.preventDefault();
-
         addPopUp('Criando publicação...');
 
-        const content = newPostContent.current.innerText;
+        const content = newPostContent.current.value;
         if (content) {
             try {
                 const newPost = await createPost(content);
@@ -61,12 +64,13 @@ function Home() {
                 setUser(prevUser => ({ ...prevUser, postsCount: prevUser.postsCount + 1 }));
 
                 addPopUp('Publicação criada com sucesso!');
-                newPostContent.current.innerText = '';
+                newPostContent.current.value = '';
                 clearSearch();
             } catch (error) {
                 addPopUp(error.message);
             }
         }
+        else addPopUp('Escreva algo para compartilhar')
     }
 
     async function deletePostHandler(postId) {
@@ -129,7 +133,7 @@ function Home() {
                         </h3>
                         <h5 className='subtle-info'> @{user.username} </h5>
                         <h5>
-                            {user.postsCount + (user.postsCount === 1 ? ' Publicação' : ' Publicações')}
+                            {user.postsCount} &nbsp; {(user.postsCount === 1 ? 'Publicação' : 'Publicações')}
                         </h5>
                     </div>
                 </RoundContainer>
@@ -138,12 +142,15 @@ function Home() {
                 </button>
             </div>
             <div className='center-container'>
-                <RoundContainer extraClasses={'new-post-container'}>
+                <form onSubmit={createPostHandler} className='new-post-container'>
                     <FontAwesomeIcon icon={user.icon} size='3x' />
-                    <p contentEditable name='new-post-input' data-placeholder='O que há de novo?'
-                        className='new-post-input' ref={newPostContent} />
+                    <input type="text"
+                        placeholder='O que há de novo?'
+                        className='new-post-input'
+                        ref={newPostContent}
+                    />
                     <button onClick={createPostHandler}>Compartilhar</button>
-                </RoundContainer>
+                </form>
                 <div className='posts-container'>
                     <h3>Novas publicações</h3>
                     {

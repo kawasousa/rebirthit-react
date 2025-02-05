@@ -101,6 +101,13 @@ function SignUp() {
       <p>
         Já tem uma conta? <Link className='link-text' to={"/login"}>Entre por aqui!</Link>
       </p>
+
+      {(window.matchMedia("(max-width: 1625px)").matches) ?
+        <div >
+          <p style={{ color: "#9f72ff" }}> RebirthIt foi projetado telas maiores! </p>
+        </div>
+        : null
+      }
     </div>
   );
 };

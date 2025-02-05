@@ -50,6 +50,7 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
+    gap: 1rem;
     width: 15rem;
 }
 
@@ -63,7 +64,7 @@
     background-color: var(--gray);
     height: 2rem;
     border-radius: .7rem;
-    width: 15rem;
+    width: 16rem;
     height: 3rem;
     transition: background-color .3s;
 }
@@ -77,10 +78,11 @@
 
 .new-post-container {
     display: flex;
-    width: 100%;
+    flex-direction: row;
     justify-content: space-between;
     gap: 1rem;
     width: 100%;
+    background-color: var(--gray);
 }
 
 .new-post-container button {
@@ -88,6 +90,7 @@
     border: none;
     border-radius: 1.2rem;
     max-height: 3.2rem;
+    width: fit-content;
     transition: border-radius .1s;
     background-color: var(--purple);
 }
@@ -99,27 +102,13 @@
 }
 
 .new-post-input {
-    border: none;
-    resize: none;
-    padding: 1rem 2rem;
-    width: 80%;
-    max-height: 10rem;
-    overflow: hidden;
-    outline: none;
-    word-break: break-word;
+    padding: 1rem 1.9rem;
+    flex: 1;
     border-radius: .5rem;
     border-bottom-left-radius: 2.2rem;
     background-color: var(--ligth-blue);
-}
-
-.new-post-input::before {
-    content: attr(data-placeholder);
+    font-size: 1rem;
     color: var(--white);
-    pointer-events: none;
-}
-
-.new-post-input:not(:empty)::before {
-    display: none;
 }
 
 .post-profile-container {
@@ -145,12 +134,12 @@
     flex-direction: column;
     gap: .7rem;
     border-bottom: 2px solid var(--ligth-blue);
-    transition: border-bottom .3s;
+    transition: border .3s;
 }
 
 .post-container:has(button:hover) {
-    border-bottom: 2px solid var(--red);
-    transition: border-bottom .3s;
+    border: 2px solid var(--red);
+    transition: border .3s;
 }
 
 .post-container div {

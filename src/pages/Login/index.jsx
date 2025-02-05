@@ -15,16 +15,16 @@ function Login() {
 
   async function handleLogin(event) {
     event.preventDefault();
-    
+
     if (username && password) {
       addPopUp('Fazendo login...');
 
       try {
         const userData = await loginUser(username, password);
         addPopUp('Login feito com sucesso');
-        
-        if(userData) navigate("/");
-        
+
+        if (userData) navigate("/");
+
       } catch (error) {
         addPopUp('Falha no login: ' + (error.message));
       }
@@ -68,6 +68,14 @@ function Login() {
       <p>
         Não tem uma conta? <Link to={"/signup"} className='link-text'>Crie uma agora!</Link>
       </p>
+      
+      {(window.matchMedia("(max-width: 1625px)").matches) ?
+        <div >
+          <p style={{color: "#9f72ff"}}> RebirthIt foi projetado telas maiores! </p>
+          
+        </div>
+        : null
+      }
     </div>
   );
 };
