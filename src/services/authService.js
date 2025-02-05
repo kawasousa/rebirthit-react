@@ -20,7 +20,7 @@ async function loginUser(username, password) {
     }
 }
 
-async function loggoutUser(navigate) {
+async function logoutUser(navigate) {
     await api.post("/auth/loggout");
     navigate("/login");
 }
@@ -32,6 +32,8 @@ async function createProfile(username, password, name, icon) {
         })
 
         if (!response.data.profileDTO) throw new Error(response.data.error)
+
+        return response.data.profileDTO;
     } catch (error) {
         let message = 'erro desconhecido';
 
@@ -52,4 +54,4 @@ async function getCurrentUser() {
     }
 }
 
-export { loginUser, loggoutUser, getCurrentUser, createProfile }
+export { loginUser, logoutUser, getCurrentUser, createProfile }

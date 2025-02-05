@@ -25,11 +25,14 @@ function SignUp() {
       addPopUp('Criando conta...')
 
       try {
-        await createProfile(username, password, name, selectedIcon);
-        addPopUp('Conta criada com sucesso!')
-        navigate('/')
+        const userData = await createProfile(username, password, name, selectedIcon);
+
+        if (userData) {
+          addPopUp('Conta criada com sucesso!')
+          navigate('/')
+        }
       } catch (error) {
-        addPopUp('Erro ao criar conta: ' + (error.error ? error.error : error.message ? error.message : 'erro desconhecido'));
+        addPopUp('Erro ao criar conta: ' + error.message);
       }
     }
     else addPopUp('Preencha todos os campos antes de prosseguir');
