@@ -7,25 +7,15 @@ async function loginUser(username, password) {
             username: username,
             password: password
         })
-
-        console.log('Resposta da API: ' + response.data);
-
         if (response.data.error) throw new Error(response.data.error);
-
-        console.log('login bem sucedido, retornando' + response.data.profileDTO + 'para o usuario');
 
         return response.data.profileDTO;
     } catch (error) {
-        console.log('erro capturado pelo catch: ' + error);
-
-        let message = 'erro desconhecido'
+        let message = 'erro desconhecido';
 
         if (axios.isAxiosError(error)) {
-            message = error.response
+            message = error.response?.data?.error || error.message
         }
-
-        console.log('mensagem enviada para frente: ' + message);
-
         throw new Error(message);
     }
 }
@@ -43,7 +33,12 @@ async function createProfile(username, password, name, icon) {
 
         if (!response.data.profileDTO) throw new Error(response.data.error)
     } catch (error) {
-        throw new Error(error.error)
+        let message = 'erro desconhecido';
+
+        if (axios.isAxiosError(error)) {
+            message = error.response?.data?.error || error.message
+        }
+        throw new Error(message);
     }
 }
 
