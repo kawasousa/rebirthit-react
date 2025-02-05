@@ -10,7 +10,7 @@ import LogoContainer from '../../components/LogoContainer'
 import Timestamp from '../../components/Timestamp'
 import PopUp from '../../components/PopUp'
 import { useNavigate } from 'react-router-dom'
-import { getCurrentUser, loggoutUser } from '../../services/authService'
+import { getCurrentUser, logoutUser } from '../../services/authService'
 import { createPost, deletePost } from '../../services/PostService'
 import ErrorPage from '../ErrorPage'
 
@@ -45,7 +45,6 @@ function Home() {
 
     const [filteredProfiles, setFilteredProfiles] = useState(profiles);
     const [filteredPosts, setFilteredPosts] = useState(posts);
-
     const [trashHovered, setTrashHovered] = useState('');
 
     async function createPostHandler(event) {
@@ -134,7 +133,7 @@ function Home() {
                         </h5>
                     </div>
                 </RoundContainer>
-                <button onClick={() => { loggoutUser(navigate) }} className='loggout-button'>
+                <button onClick={() => { logoutUser(navigate) }} className='logout-button'>
                     Sair
                 </button>
             </div>
