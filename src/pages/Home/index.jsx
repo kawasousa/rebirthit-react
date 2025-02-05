@@ -43,9 +43,9 @@ function Home() {
         setFilteredPosts(posts);
     }, [posts])
 
-    useEffect(()=>{
-        if((window.matchMedia("(max-width: 1625px)").matches)) addPopUp('Tente uma tela maior para uma experiência completa!');
-    },[])
+    useEffect(() => {
+        if ((window.matchMedia("(max-width: 1625px)").matches)) addPopUp('Tente uma tela maior para uma experiência completa!');
+    }, [])
 
     const [filteredProfiles, setFilteredProfiles] = useState(profiles);
     const [filteredPosts, setFilteredPosts] = useState(posts);
@@ -162,7 +162,10 @@ function Home() {
                                     <h3>Não foi possível buscar as publicações</h3>
                                 </RoundContainer> :
                                 filteredPosts.map(post => (
-                                    <RoundContainer key={post.id} extraClasses={'post-container'}>
+                                    <div key={post.id} className='post-container'
+                                        style={post.content.includes('@' + user.username) || post.content.includes('@everyone')?
+                                            { borderBottom: "2px solid green" } : {}}
+                                        >
                                         <div>
                                             <div className='post-profile-container'>
                                                 <FontAwesomeIcon icon={post.iconOwner} size='2x' />
@@ -190,7 +193,7 @@ function Home() {
                                         </div>
                                         <p className='post-content'>{post.content}</p>
                                         <Timestamp createdAt={post.createdAt} extraClasses={'subtle-info'} />
-                                    </RoundContainer>
+                                    </div>
                                 ))
                     }
                 </div>

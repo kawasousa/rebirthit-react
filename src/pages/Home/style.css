@@ -135,6 +135,11 @@
     gap: .7rem;
     border-bottom: 2px solid var(--ligth-blue);
     transition: border .3s;
+    background-color: var(--gray);
+    border-radius: 1rem;
+    padding: 1rem;
+    min-width: fit-content;
+    min-height: fit-content;
 }
 
 .post-container:has(button:hover) {
