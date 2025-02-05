@@ -5,7 +5,7 @@ function LogoContainer({ extraClasses }) {
     return (
         <div className={`logo-container ${extraClasses || ''}`}>
             <h1>RebirthIt</h1>
-            <FontAwesomeIcon icon="kiwi-bird" size='2x' />
+            <FontAwesomeIcon icon="hands-holding-circle" size='2x' />
         </div>
     )
 }
