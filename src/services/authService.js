@@ -39,6 +39,9 @@ async function createProfile(username, password, name, icon) {
 
         if (axios.isAxiosError(error)) {
             message = error.response?.data?.error || error.message
+
+            if(Array.isArray(message) && message.length>0) message = message[0].message;
+            console.log(message);
         }
         throw new Error(message);
     }
