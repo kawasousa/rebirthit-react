@@ -8,6 +8,7 @@
     --gray: #1B2730;
     --light-gray: #394753;
     --dark-gray: #06141D;
+    --red: #ff8888;
     font-family: "Poppins", serif;
     color: var(--white);
 }
