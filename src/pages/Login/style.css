@@ -10,7 +10,7 @@
     background-color: var(--dark-gray);
 }
 
-form{
+.form-login{
     background-color: var(--ligth-blue);
     border-radius: 1rem;
     padding: 1rem;
@@ -19,13 +19,13 @@ form{
     gap: 1rem;
 }
 
-form input {
+.form-login input {
     background-color: var(--gray);
     padding: 1rem;
     border-radius: 1rem;
 }
 
-form button{
+.form-login button{
     width: 100%;
     height: 100%;
     text-align: center;
@@ -35,7 +35,7 @@ form button{
     transition: background-color .3s;
 }
 
-form button:hover{
+.form-login button:hover{
     background-color: var(--purple);
     transition: background-color .3s;
 }
