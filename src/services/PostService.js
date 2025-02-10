@@ -6,21 +6,44 @@ export async function getAllPosts() {
     return response.data;
 }
 
-export async function createPost(content) {
+export async function createPost(content, isAdvanced, title = undefined) {
     const user = await getCurrentUser();
     const username = user.username;
+    
+    let response;
+    
+    if (isAdvanced === false) {
+        response = await api.post("/posts", { content, username, ...(title !== undefined && { title }) });
+    }
+    else {
+        response = await api.post("/posts/advanced", { content, username, ...(title !== undefined && { title }) });
+    }
 
-    const response = await api.post("/posts", { content, username });
-
-    if(!response.data) throw new Error('Erro ao criar publicação')
+    if (!response.data) throw new Error('Erro ao criar publicação')
 
     return response.data;
 }
 
-export async function deletePost(id) {
+export async function createAdvancedPost(content) {
+    const user = await getCurrentUser();
+    const username = user.username;
+
+    const response = await api.post("/posts/advanced", { content, username });
+
+    if (!response.data) throw new Error('Erro ao criar publicação')
+
+    return response.data;
+}
+
+export async function deletePost(id, interactions = undefined) {
     try {
         const user = await getCurrentUser();
-        await api.delete('/posts/' + id, { data: { requestingUsername: user.username } });
+        if(interactions){
+            await api.delete('/posts/advanced/' + id, { data: { requestingUsername: user.username } });
+        }
+        else{
+            await api.delete('/posts/' + id, { data: { requestingUsername: user.username } });
+        }
     } catch (error) {
         console.log(error);
 
