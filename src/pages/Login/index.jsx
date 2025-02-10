@@ -20,11 +20,8 @@ function Login() {
       addPopUp('Fazendo login...');
 
       try {
-        const userData = await loginUser(username, password);
-        addPopUp('Login feito com sucesso');
-
-        if (userData) navigate("/");
-
+        await loginUser(username, password);
+        navigate("/");
       } catch (error) {
         addPopUp('Falha no login: ' + (error.message));
       }
@@ -48,10 +45,10 @@ function Login() {
         {popUps.map((message, index) => (<PopUp key={index} message={message} onClose={() => removePopUp(index)} />))}
       </div>
       <h2>Entre na sua conta</h2>
-      <form>
+      <form className='form-login' >
         <input
           type="text"
-          placeholder="Seu nome de usuário"
+          placeholder="Seu nome de usuário ou email"
           required
           value={username}
           onChange={handleUsernameChange}
@@ -68,11 +65,11 @@ function Login() {
       <p>
         Não tem uma conta? <Link to={"/signup"} className='link-text'>Crie uma agora!</Link>
       </p>
-      
+
       {(window.matchMedia("(max-width: 1625px)").matches) ?
         <div >
-          <p style={{color: "#9f72ff"}}> RebirthIt foi projetado telas maiores! </p>
-          
+          <p style={{ color: "#9f72ff" }}> RebirthIt foi projetado telas maiores! </p>
+
         </div>
         : null
       }

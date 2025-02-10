@@ -13,6 +13,7 @@ function SignUp() {
   const navigate = useNavigate();
   const { popUps, addPopUp, removePopUp } = usePopUps();
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(null);
@@ -21,18 +22,14 @@ function SignUp() {
 
   async function handleSignUp(event) {
     event.preventDefault();
-    if (selectedIcon && username && password && name && selectedIcon) {
+    if (selectedIcon && username && email && password && name && selectedIcon) {
       addPopUp('Criando conta...')
 
       try {
-        const userData = await createProfile(username, password, name, selectedIcon);
-
-        if (userData) {
-          addPopUp('Conta criada com sucesso!')
-          navigate('/')
-        }
+        await createProfile(username, email, password, name, selectedIcon);
+        navigate('/')
       } catch (error) {
-        addPopUp('Erro ao criar conta: ' + error.message);
+        addPopUp(error.message);
       }
     }
     else addPopUp('Preencha todos os campos antes de prosseguir');
@@ -54,7 +51,7 @@ function SignUp() {
       </div>
       <LogoContainer />
       <h2>{`Boas vindas${!name ? '' : ', ' + name}`}!</h2>
-      <form>
+      <form className='form-login'>
         <input
           type="text"
           placeholder="Seu nome único de usuário"
@@ -63,6 +60,13 @@ function SignUp() {
 
           required
           onChange={handleUsernameChange}
+        />
+        <input
+          type="text"
+          placeholder="Seu email"
+          value={email}
+          required
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="text"

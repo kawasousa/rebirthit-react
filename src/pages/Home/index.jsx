@@ -29,27 +29,39 @@ function Home() {
     }, [navigate]);
 
     const newPostContent = useRef('');
+    const newPostTitle = useRef('');
     const searchInput = useRef('');
 
     const { posts, setPosts, postLoading, postError } = usePosts();
     const { profiles, profileLoading, profileError } = useProfiles();
     const { popUps, addPopUp, removePopUp } = usePopUps();
 
+    const interactionIcons = ['thumbs-up', 'thumbs-down', 'face-grin-squint-tears', 'face-surprise']
+    const interactionType = {
+        "thumbs-up": "Like",
+        "thumbs-down": "Dislike",
+        "face-grin-squint-tears": "Laugh",
+        "face-surprise": "Surprise"
+    }
+
     useEffect(() => {
-        setFilteredProfiles(profiles)
+        if (profiles) setFilteredProfiles(profiles)
     }, [profiles]);
 
     useEffect(() => {
-        setFilteredPosts(posts);
+        if (posts) setFilteredPosts(posts);
     }, [posts])
 
     useEffect(() => {
         if ((window.matchMedia("(max-width: 1625px)").matches)) addPopUp('Tente uma tela maior para uma experiência completa!');
     }, [])
 
-    const [filteredProfiles, setFilteredProfiles] = useState(profiles);
-    const [filteredPosts, setFilteredPosts] = useState(posts);
+    const [filteredProfiles, setFilteredProfiles] = useState(profiles || []);
+    const [filteredPosts, setFilteredPosts] = useState(posts || []);
     const [trashHovered, setTrashHovered] = useState('');
+    const [isAdvancedPost, setIsAdvancedPost] = useState(false);
+
+    const [interaction, setInteraction] = useState({ icon: null, postId: null });
 
     async function createPostHandler(event) {
         event.preventDefault();
@@ -58,13 +70,14 @@ function Home() {
         const content = newPostContent.current.value;
         if (content) {
             try {
-                const newPost = await createPost(content);
+                const newPost = await createPost(content, isAdvancedPost, newPostTitle.current.value || undefined);
 
                 setPosts(prevPosts => [newPost, ...prevPosts]);
                 setUser(prevUser => ({ ...prevUser, postsCount: prevUser.postsCount + 1 }));
 
                 addPopUp('Publicação criada com sucesso!');
                 newPostContent.current.value = '';
+                newPostTitle.current.value = '';
                 clearSearch();
             } catch (error) {
                 addPopUp(error.message);
@@ -73,13 +86,14 @@ function Home() {
         else addPopUp('Escreva algo para compartilhar')
     }
 
-    async function deletePostHandler(postId) {
+    async function deletePostHandler(postId, username, interactions) {
         addPopUp('Apagando publicação...');
-        await deletePost(postId);
+        await deletePost(postId, interactions || undefined);
         const updatedPosts = posts.filter(post => post.id !== postId);
 
         setPosts(updatedPosts);
-        setUser(prevUser => ({ ...prevUser, postsCount: prevUser.postsCount - 1 }));
+        if (username === user.username)
+            setUser(prevUser => ({ ...prevUser, postsCount: prevUser.postsCount - 1 }));
 
         clearSearch()
         addPopUp('Publicação removida!')
@@ -90,7 +104,7 @@ function Home() {
         if (content) {
             const newFilteredProfiles = profiles.filter(profile => profile.username.startsWith(content))
 
-            if (!newFilteredProfiles.length) {
+            if (!newFilteredProfiles || !newFilteredProfiles.length) {
                 setFilteredProfiles([]);
                 setFilteredPosts(posts);
             }
@@ -112,7 +126,7 @@ function Home() {
 
     if (!user) {
         return (
-            <ErrorPage />
+            <ErrorPage message={'Tentando carregar seu usuário...'} />
         )
     }
 
@@ -122,34 +136,44 @@ function Home() {
                 {popUps.map((message, index) => (<PopUp key={index} message={message} onClose={() => removePopUp(index)} />))}
             </div>
             <div className='profile-container'>
-                <button onClick={() => { window.scrollTo(0, 0) }}> <LogoContainer /> </button>
-                <RoundContainer extraClasses={'profile-info-container'}>
-                    <FontAwesomeIcon icon={user.icon} size='4x' />
-                    <div>
-                        <h3>{user.name} &nbsp;
-                            {user.role === 'Admin' &&
-                                <FontAwesomeIcon icon='circle-check' />
-                            }
-                        </h3>
-                        <h5 className='subtle-info'> @{user.username} </h5>
-                        <h5>
-                            {user.postsCount} &nbsp; {(user.postsCount === 1 ? 'Publicação' : 'Publicações')}
-                        </h5>
-                    </div>
-                </RoundContainer>
+                <div className='profile-container-header' >
+                    <button onClick={() => { window.scrollTo(0, 0) }}> <LogoContainer /> </button>
+                    <button onClick={() => { searchInput.current.value = user.username; handleSearch() }} >
+                        <RoundContainer extraClasses={'profile-info-container'}>
+                            <FontAwesomeIcon icon={user.icon} size='4x' />
+                            <div>
+                                <h3>{user.name} &nbsp;
+                                    {user.role === 'Admin' &&
+                                        <FontAwesomeIcon icon='circle-check' />
+                                    }
+                                </h3>
+                                <h5 className='subtle-info'> @{user.username} </h5>
+                                <h5>
+                                    {user.postsCount} &nbsp; {(user.postsCount === 1 ? 'Publicação' : 'Publicações')}
+                                </h5>
+                            </div>
+                        </RoundContainer>
+                    </button>
+                </div>
                 <button onClick={() => { logoutUser(navigate) }} className='logout-button'>
                     Sair
                 </button>
             </div>
             <div className='center-container'>
-                <form onSubmit={createPostHandler} className='new-post-container'>
-                    <FontAwesomeIcon icon={user.icon} size='3x' />
-                    <input type="text"
-                        placeholder='O que há de novo?'
-                        className='new-post-input'
+                <form className='new-post-container' onSubmit={createPostHandler}>
+                    <div className='new-post-header'>
+                        <FontAwesomeIcon icon={user.icon} size='2x' />
+                        <input type="text" placeholder='Algum título?' ref={newPostTitle} />
+                    </div>
+                    <input type="text" className='new-post-content'
                         ref={newPostContent}
-                    />
-                    <button onClick={createPostHandler}>Compartilhar</button>
+                        placeholder='O que há de novo?' />
+                    <div className='new-post-footer'>
+                        <button type='button' className='toggle-advanced-post-button' data-placeholder={isAdvancedPost ? 'avançado' : 'comum'} onClick={() => setIsAdvancedPost(prev => !prev)} >
+                            <FontAwesomeIcon icon={isAdvancedPost ? 'heart-circle-check' : 'heart-circle-xmark'} size='2x' />
+                        </button>
+                        <button className='send-post-button'>compartilhar</button>
+                    </div>
                 </form>
                 <div className='posts-container'>
                     <h3>Novas publicações</h3>
@@ -157,15 +181,17 @@ function Home() {
                         postLoading ? <FontAwesomeIcon icon='circle-notch' spin size='3x' /> :
                             postError ?
                                 <RoundContainer>
-                                    <h2>{error.message}</h2>
+                                    <h2>{postError.message}</h2>
                                     <FontAwesomeIcon icon='triangle-exclamation' bounce size='4x' />
                                     <h3>Não foi possível buscar as publicações</h3>
                                 </RoundContainer> :
                                 filteredPosts.map(post => (
-                                    <div key={post.id} className='post-container'
-                                        style={post.content.includes('@' + user.username) || post.content.includes('@everyone')?
+                                    <div key={post.id}
+                                        className={`post-container ${trashHovered === post.id ? 'trash-hovered' : ''}
+                                    `}
+                                        style={post.content.includes('@' + user.username) || post.content.includes('@everyone') ?
                                             { borderBottom: "2px solid green" } : {}}
-                                        >
+                                    >
                                         <div>
                                             <div className='post-profile-container'>
                                                 <FontAwesomeIcon icon={post.iconOwner} size='2x' />
@@ -179,7 +205,8 @@ function Home() {
                                                 <p className='subtle-info'>| &nbsp; @{post.usernameOwner}</p>
                                             </div>
                                             <button
-                                                onClick={() => deletePostHandler(post.id)}
+                                                className='post-container-trash'
+                                                onClick={() => deletePostHandler(post.id, post.usernameOwner, post.interactions)}
                                                 onMouseEnter={() => { setTrashHovered(post.id) }}
                                                 onMouseLeave={() => { setTrashHovered('') }}
                                             >
@@ -191,7 +218,29 @@ function Home() {
                                                 }
                                             </button>
                                         </div>
-                                        <p className='post-content'>{post.content}</p>
+                                        <div className={`post-content
+                                        ${post.interactions ? 'advanced' : ''} 
+                                        ${post.title ? 'titled' : ''}
+                                        `}>
+                                            {post.title && <h3>{post.title}</h3>}
+                                            <p>
+                                                {post.content}
+                                            </p>
+                                        </div>
+                                        <div className='interaction-container'>
+                                            {
+                                                post.interactions &&
+                                                interactionIcons.map((icon, index) => {
+                                                    return (
+                                                        <button key={index} type='button'
+                                                            className={`selected-interaction`}
+                                                            onClick={() => { }}>
+                                                            <FontAwesomeIcon icon={icon} size='2x' />
+                                                        </button>
+                                                    )
+                                                })
+                                            }
+                                        </div>
                                         <Timestamp createdAt={post.createdAt} extraClasses={'subtle-info'} />
                                     </div>
                                 ))
@@ -211,7 +260,7 @@ function Home() {
                         </button>
                     }
                 </div>
-                {filteredProfiles.length > 0 ? (
+                {filteredProfiles && filteredProfiles.length > 0 ? (
                     profileLoading ? <FontAwesomeIcon icon='circle-notch' spin /> :
                         profileError ?
                             <RoundContainer>
@@ -235,7 +284,7 @@ function Home() {
                 ) :
                     <RoundContainer>
                         <FontAwesomeIcon icon='person-circle-question' size='2x' /> &nbsp;
-                        Ninguém encontrado
+                        ninguém por aqui!
                     </RoundContainer>
                 }
             </div>
