@@ -19,8 +19,7 @@ export function useProfiles() {
         }
 
         fetchData();
-    }, []
-    )
+    }, [])
 
     return { profiles, profilesLoading, profilesError }
 }
