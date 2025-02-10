@@ -1,10 +1,10 @@
 import axios from 'axios';
 import api from './rebirthit-api'
 
-async function loginUser(username, password) {
+async function loginUser(uniqueCredential, password) {
     try {
         const response = await api.post("/auth/login", {
-            username: username,
+            uniqueCredential: uniqueCredential,
             password: password
         })
         if (response.data.error) throw new Error(response.data.error);
@@ -14,34 +14,29 @@ async function loginUser(username, password) {
         let message = 'erro desconhecido';
 
         if (axios.isAxiosError(error)) {
-            message = error.response?.data?.error || error.message
+            message = error.response.data.message
         }
+        console.log(message);
+
         throw new Error(message);
     }
 }
 
 async function logoutUser(navigate) {
-    await api.post("/auth/loggout");
+    await api.post("/auth/logout");
     navigate("/login");
 }
 
-async function createProfile(username, password, name, icon) {
+async function createProfile(username, email, password, name, icon) {
     try {
-        const response = await api.post("/auth/register", {
-            username, password, name, icon, role: "Default"
+        await api.post("/auth/register", {
+            username, email, password, name, icon, role: "Default"
         })
-
-        if (!response.data.profileDTO) throw new Error(response.data.error)
-
-        return response.data.profileDTO;
+        return;
     } catch (error) {
         let message = 'erro desconhecido';
-
         if (axios.isAxiosError(error)) {
-            message = error.response?.data?.error || error.message
-
-            if(Array.isArray(message) && message.length>0) message = message[0].message;
-            console.log(message);
+            message = error.response.data.message
         }
         throw new Error(message);
     }
